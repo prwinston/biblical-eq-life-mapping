@@ -1,0 +1,8 @@
+name = "biblical-eq-assessment"
+compatibility_date = "2026-09-19"
+
+# This is a plain static site (no build step) served from the repo root.
+# Used only if you deploy via the Wrangler CLI (see README "Option B").
+# If you deploy by connecting the repo in the Cloudflare dashboard instead,
+# you can ignore this file entirely.
+pages_build_output_dir = "."
