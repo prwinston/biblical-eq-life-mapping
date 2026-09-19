@@ -16,6 +16,20 @@ logic runs in the visitor's browser, and their in-progress answers are saved
 to their own browser's `localStorage` so a refresh doesn't lose their place.
 Nothing is ever sent to a server.
 
+A "Download results (PDF)" button under the synthesis map lets a visitor
+save a one-page results summary — their name/date/context (if entered),
+each domain's score, status and matched recommendation, and the full
+synthesis map — generated entirely in their browser via
+[jsPDF](https://github.com/parallax/jsPDF), vendored locally in
+`vendor/jspdf.umd.min.js` (MIT-licensed; see `vendor/jspdf-LICENSE.txt`) so
+it works offline with no CDN dependency. It's enabled as soon as at least
+one domain has an answer, and works on partial results too — it just notes
+which domains aren't finished yet.
+
+The page is also print-friendly on its own (`Ctrl+P` / `Cmd+P` — most
+browsers offer "Save as PDF" right there too), if you'd rather print the
+whole assessment with answers marked rather than the condensed PDF summary.
+
 ## Running it locally
 
 Any static file server works. For example, from this folder:

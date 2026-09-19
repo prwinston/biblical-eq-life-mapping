@@ -305,6 +305,22 @@ button, input { font-family: inherit; }
 .synthesis-note { font-size: 14px; text-align: center; color: var(--label); }
 .synthesis-note.complete { color: var(--ink-soft); font-style: italic; }
 
+.download-row { display: flex; flex-direction: column; align-items: center; gap: 8px; padding-top: 8px; }
+.download-btn {
+  padding: 12px 28px;
+  border-radius: 4px;
+  border: none;
+  background: var(--accent);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.download-btn:hover { background: var(--accent-hover); }
+.download-btn:disabled { background: var(--tint-06); color: var(--ink-faint); cursor: not-allowed; }
+.download-hint { font-size: 12px; color: var(--ink-faint); text-align: center; max-width: 380px; }
+
 /* Scoring reference */
 .reference { background: var(--tint-04); border-radius: 6px; padding: 28px; display: flex; flex-direction: column; gap: 16px; }
 .reference-title { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--label); }
@@ -327,6 +343,7 @@ button, input { font-family: inherit; }
   body { background: #fff; }
   .page { padding: 0; }
   .reset-link { display: none; }
+  .download-row { display: none; }
   .opt-btn { border: 1px solid #000; color: #000; }
   .opt-btn.selected { background: #ddd; border-color: #000; color: #000; }
 }

@@ -265,6 +265,180 @@
   window.setContext = setContext;
   window.resetAll = resetAll;
 
+  // ---------- PDF export ----------
+
+  function titleCase(str) {
+    return String(str).replace(/\w\S*/g, function (t) {
+      return t.charAt(0).toUpperCase() + t.slice(1).toLowerCase();
+    });
+  }
+
+  function slugify(str) {
+    return String(str).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+  }
+
+  function downloadPdf() {
+    if (Object.keys(state.answers).length === 0) {
+      window.alert("Answer at least one domain before downloading a results summary.");
+      return;
+    }
+    if (!window.jspdf || !window.jspdf.jsPDF) {
+      window.alert("The PDF library (vendor/jspdf.umd.min.js) did not load, so a PDF can't be built right now. Reloading the page usually fixes this.");
+      return;
+    }
+
+    var domains = computeDomains();
+    var totalAnswered = Object.keys(state.answers).length;
+    var allComplete = totalAnswered === TOTAL_ITEMS;
+
+    var INK = [43, 36, 32];
+    var INK_SOFT = [91, 79, 66];
+    var INK_FAINT = [166, 154, 138];
+    var LABEL = [138, 124, 107];
+    var ACCENT = [177, 85, 47];
+    var HAIRLINE = [225, 220, 210];
+
+    var doc = new window.jspdf.jsPDF({ unit: "pt", format: "a4" });
+    var pageWidth = doc.internal.pageSize.getWidth();
+    var pageHeight = doc.internal.pageSize.getHeight();
+    var margin = 56;
+    var contentWidth = pageWidth - margin * 2;
+    var y = margin;
+
+    function ensureSpace(h) {
+      if (y + h > pageHeight - margin) {
+        doc.addPage();
+        y = margin;
+      }
+    }
+
+    function hr(before, after) {
+      y += before || 0;
+      doc.setDrawColor(HAIRLINE[0], HAIRLINE[1], HAIRLINE[2]);
+      doc.setLineWidth(0.75);
+      doc.line(margin, y, pageWidth - margin, y);
+      y += after != null ? after : 16;
+    }
+
+    function paragraph(text, font, style, size, color, lineHeight) {
+      doc.setFont(font, style);
+      doc.setFontSize(size);
+      doc.setTextColor(color[0], color[1], color[2]);
+      var lines = doc.splitTextToSize(text, contentWidth);
+      lines.forEach(function (line) {
+        ensureSpace(lineHeight);
+        doc.text(line, margin, y);
+        y += lineHeight;
+      });
+    }
+
+    // Header
+    doc.setFont("times", "bold");
+    doc.setFontSize(10.5);
+    doc.setTextColor(LABEL[0], LABEL[1], LABEL[2]);
+    doc.text("A COMPANION TO EMOTIONALLY WHOLE: FROM THE MIRROR TO THE DOOR", margin, y);
+    y += 24;
+
+    doc.setFont("times", "bold");
+    doc.setFontSize(26);
+    doc.setTextColor(INK[0], INK[1], INK[2]);
+    doc.text("Interior Life Mapping", margin, y);
+    y += 22;
+
+    doc.setFont("times", "italic");
+    doc.setFontSize(13);
+    doc.setTextColor(INK_SOFT[0], INK_SOFT[1], INK_SOFT[2]);
+    doc.text("Results Summary", margin, y);
+    y += 24;
+
+    var metaLine = [];
+    if (state.name) metaLine.push("Name: " + state.name);
+    if (state.date) metaLine.push("Date: " + state.date);
+    if (state.context) metaLine.push("Context: " + state.context);
+    if (metaLine.length) {
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10.5);
+      doc.setTextColor(INK[0], INK[1], INK[2]);
+      doc.text(metaLine.join("      "), margin, y);
+      y += 20;
+    }
+
+    hr(4, 22);
+
+    // Per-domain results
+    domains.forEach(function (domain) {
+      var d = domain.def;
+      ensureSpace(70);
+
+      doc.setFont("times", "bold");
+      doc.setFontSize(14);
+      doc.setTextColor(INK[0], INK[1], INK[2]);
+      doc.text("Domain " + domain.roman + " — " + titleCase(d.name) + "  ·  " + d.subtitle, margin, y);
+      y += 18;
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10);
+      doc.setTextColor(LABEL[0], LABEL[1], LABEL[2]);
+      var scoreLine = domain.complete
+        ? "Score " + domain.scoreLabel + " / 5.0      Status: " + domain.statusLabel
+        : domain.answeredCount + " of 7 answered — not yet complete";
+      doc.text(scoreLine, margin, y);
+      y += 18;
+
+      if (domain.complete && d.recommendations) {
+        paragraph(d.recommendations[domain.bandIndex], "times", "italic", 11, INK, 15);
+      }
+      y += 12;
+    });
+
+    hr(0, 22);
+
+    // Synthesis
+    ensureSpace(30);
+    doc.setFont("times", "bold");
+    doc.setFontSize(16);
+    doc.setTextColor(INK[0], INK[1], INK[2]);
+    doc.text("My Interior Life Map", margin, y);
+    y += 24;
+
+    domains.forEach(function (domain) {
+      ensureSpace(22);
+      var d = domain.def;
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(11);
+      doc.setTextColor(INK[0], INK[1], INK[2]);
+      doc.text(titleCase(d.name) + " · " + d.subtitle, margin, y);
+
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(ACCENT[0], ACCENT[1], ACCENT[2]);
+      var right = domain.scoreLabel + " / 5   " + domain.statusLabel;
+      var rightWidth = doc.getTextWidth(right);
+      doc.text(right, pageWidth - margin - rightWidth, y);
+      y += 20;
+    });
+
+    y += 6;
+    var noteText = allComplete
+      ? "All five domains complete. This map is a conversation starter, not a diagnosis — bring it to the mirror, and then to the door."
+      : "Only " + totalAnswered + " of " + TOTAL_ITEMS + " items were answered when this was generated — complete every domain for a full map.";
+    paragraph(noteText, "times", "italic", 10.5, INK_SOFT, 15);
+
+    hr(14, 20);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
+    doc.setTextColor(INK_FAINT[0], INK_FAINT[1], INK_FAINT[2]);
+    doc.text("Winston H.K. Chew · Companion resource to Emotionally Whole: From the Mirror to the Door", margin, y);
+    y += 13;
+    doc.text("Generated " + new Date().toLocaleString(), margin, y);
+
+    var filenameParts = ["interior-life-mapping"];
+    if (state.name) filenameParts.push(slugify(state.name));
+    doc.save(filenameParts.join("-") + ".pdf");
+  }
+
+  window.downloadPdf = downloadPdf;
+
   // ---------- rendering ----------
 
   function escapeHtml(str) {
@@ -387,7 +561,7 @@
     );
   }
 
-  function renderSynthesis(domains, allComplete) {
+  function renderSynthesis(domains, allComplete, totalAnswered) {
     var rows = domains.map(function (domain) {
       var d = domain.def;
       return (
@@ -404,11 +578,21 @@
       ? '<div class="synthesis-note complete">All five domains complete. This map is a conversation starter, not a diagnosis — bring it to the mirror, and then to the door.</div>'
       : '<div class="synthesis-note">Complete all five domains above to see your full interior life map.</div>';
 
+    var downloadHint = totalAnswered > 0
+      ? (allComplete
+          ? "Saves your scores, status and recommended practice for each domain as a PDF."
+          : "You can download a summary any time — it will note which domains are still in progress.")
+      : "Answer at least one domain to enable the download.";
+
     return (
       '<div class="synthesis">' +
       '<div class="synthesis-head"><h2 class="synthesis-title">My Interior Life Map</h2><div class="synthesis-sub">Synthesis across all five domains</div></div>' +
       '<div class="synthesis-table">' + rows + "</div>" +
       note +
+      '<div class="download-row">' +
+      '<button type="button" class="download-btn"' + (totalAnswered > 0 ? "" : " disabled") + ' onclick="downloadPdf()">Download results (PDF)</button>' +
+      '<div class="download-hint">' + downloadHint + "</div>" +
+      "</div>" +
       "</div>"
     );
   }
@@ -447,7 +631,7 @@
       renderIntro() +
       renderProgress(totalAnswered, progressPct) +
       domains.map(renderDomain).join("") +
-      renderSynthesis(domains, allComplete) +
+      renderSynthesis(domains, allComplete, totalAnswered) +
       renderReference() +
       renderFooter();
 
