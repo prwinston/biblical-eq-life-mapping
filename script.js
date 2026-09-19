@@ -11,7 +11,6 @@
   "use strict";
 
   var STORAGE_KEY = "ile-assessment-v1";
-  var CONTEXTS = ["Personal Reflection", "Counselling Session", "Coaching", "Group Workshop"];
   var ROMAN = ["I", "II", "III", "IV", "V"];
 
   var DOMAINS = [
@@ -157,7 +156,7 @@
     door: '<svg width="26" height="26" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h13v24H9z"></path><circle cx="19" cy="16" r="1.2" fill="currentColor" stroke="none"></circle></svg>'
   };
 
-  var state = { answers: {}, name: "", date: "", context: null };
+  var state = { answers: {}, name: "", date: "" };
 
   // ---------- persistence ----------
 
@@ -170,7 +169,6 @@
           state.answers = parsed.answers || {};
           state.name = parsed.name || "";
           state.date = parsed.date || "";
-          state.context = parsed.context || null;
         }
       }
     } catch (e) {
@@ -246,15 +244,9 @@
     saveState();
   }
 
-  function setContext(value) {
-    state.context = value === state.context ? null : value;
-    saveState();
-    render();
-  }
-
   function resetAll() {
     if (!window.confirm("Clear all your answers? This cannot be undone.")) return;
-    state = { answers: {}, name: "", date: "", context: null };
+    state = { answers: {}, name: "", date: "" };
     saveState();
     render();
   }
@@ -262,7 +254,6 @@
   window.setAnswer = setAnswer;
   window.setName = setName;
   window.setDate = setDate;
-  window.setContext = setContext;
   window.resetAll = resetAll;
 
   // ---------- PDF export ----------
@@ -354,7 +345,6 @@
     var metaLine = [];
     if (state.name) metaLine.push("Name: " + state.name);
     if (state.date) metaLine.push("Date: " + state.date);
-    if (state.context) metaLine.push("Context: " + state.context);
     if (metaLine.length) {
       doc.setFont("helvetica", "normal");
       doc.setFontSize(10.5);
@@ -464,15 +454,6 @@
   }
 
   function renderIntro() {
-    var pills = CONTEXTS.map(function (c) {
-      var selected = state.context === c;
-      return (
-        '<button type="button" class="pill' + (selected ? " selected" : "") + '" aria-pressed="' + selected + '" onclick="setContext(\'' + c + "')\">" +
-        escapeHtml(c) +
-        "</button>"
-      );
-    }).join("");
-
     return (
       '<div class="card">' +
       '<div class="meta-row">' +
@@ -481,8 +462,6 @@
       '<div class="field"><label for="fld-date">Date</label>' +
       '<input id="fld-date" type="text" value="' + escapeAttr(state.date) + '" placeholder="dd / mm / yyyy" oninput="setDate(this.value)"></div>' +
       "</div>" +
-      '<div class="context-row"><label style="font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:var(--label);">Context</label>' +
-      '<div class="pills">' + pills + "</div></div>" +
       '<div class="intro-note">Complete each domain independently. Work quickly — your first instinct is more accurate than your considered one. This instrument is a conversation starter, not a diagnostic. Scores open questions; they do not close them.</div>' +
       "</div>"
     );

@@ -132,21 +132,6 @@ button, input { font-family: inherit; }
 }
 .field input:focus { border-bottom-color: var(--accent); }
 
-.context-row { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
-.pills { display: flex; gap: 10px; flex-wrap: wrap; }
-.pill {
-  padding: 8px 16px;
-  border-radius: 999px;
-  font-size: 13px;
-  cursor: pointer;
-  border: 1px solid var(--border-soft);
-  background: var(--white);
-  color: var(--ink-soft);
-  transition: border-color 0.15s, background 0.15s, color 0.15s;
-}
-.pill:hover { border-color: var(--accent); }
-.pill.selected { background: var(--accent-tint); border-color: var(--accent); color: var(--accent); }
-
 .intro-note {
   font-size: 14px;
   line-height: 1.7;
