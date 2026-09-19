@@ -1,8 +1,11 @@
 name = "biblical-eq-assessment"
 compatibility_date = "2026-09-19"
 
-# This is a plain static site (no build step) served from the repo root.
-# Used only if you deploy via the Wrangler CLI (see README "Option B").
-# If you deploy by connecting the repo in the Cloudflare dashboard instead,
-# you can ignore this file entirely.
-pages_build_output_dir = "."
+# This is a plain static site (no build step, no Worker script) — served
+# directly from the repo root as static assets. This config works with
+# `npx wrangler deploy` (Cloudflare's Git-connected "Workers Builds" runs
+# that command by default, even for a static-only project) and does NOT
+# need `wrangler pages deploy`.
+[assets]
+directory = "."
+not_found_handling = "single-page-application"

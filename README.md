@@ -42,34 +42,46 @@ git push -u origin main
 (Create the empty repository on GitHub first — github.com/new — without a
 README, license or .gitignore, since this folder already has its own.)
 
-## Deploying to Cloudflare Pages
+## Deploying to Cloudflare
+
+Cloudflare now serves plain static sites two ways — old-style **Pages**, and
+newer **Workers with static assets** (no Worker script needed for a site
+like this one). This repo is set up for the second, since that's what
+Cloudflare's Git-connected "Workers Builds" runs by default (`wrangler
+deploy`, not `wrangler pages deploy`).
 
 ### Option A — connect the repo in the Cloudflare dashboard (recommended, no CLI)
 
 1. Push the repo to GitHub (above).
-2. In the Cloudflare dashboard, go to **Workers & Pages → Create → Pages →
-   Connect to Git**, and select this repository.
-3. Build settings:
-   - Framework preset: **None**
-   - Build command: *(leave empty)*
-   - Build output directory: `/`
-4. Click **Save and Deploy**. Cloudflare will give you a
-   `*.pages.dev` URL immediately, and will redeploy automatically on every
-   push to `main`.
-5. Optional: add a custom domain under the Pages project's **Custom domains**
-   tab.
+2. In the Cloudflare dashboard, go to **Compute (Workers) → Create → Import
+   a repository** (or **Workers & Pages → Create → Connect to Git**,
+   depending on which layout you're shown), and select this repository.
+3. Leave the build command empty — `wrangler.toml`'s `[assets]` block
+   already tells it to deploy the repo root as static files. Cloudflare
+   will run `npx wrangler deploy`, which now works directly.
+4. Click **Save and Deploy**. You'll get a `*.workers.dev` URL immediately,
+   and it redeploys automatically on every push to `main`.
+5. Optional: add a custom domain under the project's **Custom domains** tab.
 
 ### Option B — deploy from the command line with Wrangler
 
 ```
 npx wrangler login
-npx wrangler pages deploy .
+npx wrangler deploy
 ```
 
-`wrangler.toml` in this folder already names the project
-`biblical-eq-assessment` and points at the current directory as the output —
-Wrangler will pick both up automatically. You'll be prompted to create the
-Pages project the first time.
+`wrangler.toml` already names the project `biblical-eq-assessment` and
+points `[assets] directory` at the current folder — Wrangler picks both up
+automatically. You'll be prompted to create the project the first time.
+
+### If you still want classic Pages instead
+
+Pages (via `wrangler pages deploy .` or the dashboard's **Pages → Connect to
+Git** flow with build output directory `/`) also works fine with these same
+files — Pages doesn't need `wrangler.toml` at all, since it ignores it. Only
+use this path if your Cloudflare account's deploy pipeline is actually
+invoking `wrangler pages deploy` rather than `wrangler deploy` — check
+whichever error message (if any) your first attempt gave you.
 
 ## Editing the content
 
