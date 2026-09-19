@@ -34,6 +34,11 @@
         { range: "7–17", text: "Limited self-awareness. The gap between self-image and reality may be wide and largely invisible." },
         { range: "18–28", text: "Developing self-awareness. Reflection is happening; insight is inconsistent." },
         { range: "29–35", text: "Strong self-awareness. The mirror is held honestly and regularly." }
+      ],
+      recommendations: [
+        "Start with the most basic mirror work: for one week, name one emotion by its precise word at the end of each day — not “fine” or “stressed,” but the specific feeling underneath it. Ask one trusted person how a recent decision of yours looked from where they stood, and simply listen.",
+        "Build a fixed rhythm around the reflection you already do naturally — a two-minute check-in at the same time each day turns occasional insight into a habit. Ask for feedback on the specific blind spot you suspect is there, not just general feedback.",
+        "Your mirror work is a resource, not only a discipline — use it to help someone else see themselves more clearly. Keep actively soliciting feedback so strength doesn’t quietly harden into blind confidence."
       ]
     },
     {
@@ -55,6 +60,11 @@
         { range: "7–17", text: "Significant regulation difficulty. The furnace may be governing the person rather than forming them." },
         { range: "18–28", text: "Moderate regulation. Able to manage in most situations; specific pressure points remain unaddressed." },
         { range: "29–35", text: "Strong regulation. The interior has been brought under deliberate governance over time." }
+      ],
+      recommendations: [
+        "Pick the one situation where regulation fails most often, and install a single circuit-breaker for it: a fixed pause — counting to ten, leaving the room, one breath of prayer — before you respond, in that exact situation, this week.",
+        "You can regulate in most situations; find the specific pressure point where it still breaks down, and build one deliberate strategy for that pressure point alone, rather than a general resolution to ‘stay calmer.’",
+        "The furnace has done real formation work in you — the next step is naming it out loud to someone walking through their own furnace right now, so your regulation becomes their evidence that it’s possible."
       ]
     },
     {
@@ -76,6 +86,11 @@
         { range: "7–17", text: "Motivation may be primarily excitement- or obligation-based. The burden beneath the calling needs locating." },
         { range: "18–28", text: "Mixed motivation. A genuine drive is present but may be diluted by external dependency." },
         { range: "29–35", text: "Burden-based drive. The calling is sourced in something deeper than affirmation or outcome." }
+      ],
+      recommendations: [
+        "Sit, like Nehemiah, with the specific ruin you keep managing rather than mourning. Give it ten unhurried minutes this week — no fixing, just naming what’s actually broken — before asking what rebuilding would require of you.",
+        "Name the one recognition or outcome your drive still quietly depends on, and do the next right thing in that area once without telling anyone — a small test of whether the burden, not the applause, is what’s sourcing you.",
+        "Burden-based drive is rare and depletable — protect it deliberately. Build in a rhythm of rest before the ruins wear you down; the risk at this level isn’t losing the calling, it’s losing yourself inside it."
       ]
     },
     {
@@ -97,6 +112,11 @@
         { range: "7–17", text: "Empathic depletion likely. The capacity for genuine border-crossing may be near its functional limit." },
         { range: "18–28", text: "Empathy is present but under strain. The source from which it draws needs attention." },
         { range: "29–35", text: "Strong empathic capacity. The crossing is happening; maintaining the source is the formation priority." }
+      ],
+      recommendations: [
+        "Before any new crossing, address the depletion itself: block one hour this week with no caregiving demands on it at all, and treat it as the precondition for empathy, not a reward for having enough left over.",
+        "Identify the one relationship currently receiving the least genuine crossing from you, and make one specific, scheduled move toward it this week — a call, a visit, a real question — rather than waiting to feel more resourced first.",
+        "Your capacity to cross is strong; the ongoing work is tending the source it draws from. Build one recurring practice — solitude, worship, supervision, a friendship that pours into you — that isn’t itself another act of caregiving."
       ]
     },
     {
@@ -118,6 +138,11 @@
         { range: "7–17", text: "Social intelligence may be primarily positional or competency-based. Character-formed influence needs development." },
         { range: "18–28", text: "Growing social intelligence. The door is opening in some contexts; character formation remains the work." },
         { range: "29–35", text: "Strong character-formed social intelligence. The door is opened for others consistently." }
+      ],
+      recommendations: [
+        "Notice where your influence still runs on position or competence rather than character, and pick one low-stakes relationship this week to lead purely through the quality of your presence — no title, no expertise, just attention.",
+        "You have a door in your hands — name the specific access or opportunity only you can currently offer someone, and open it for them deliberately this week, rather than waiting for the ideal moment.",
+        "The door is open for others consistently — the growth edge now is the hardest conversation you’ve been avoiding: the correction or honest word someone needs from you and hasn’t yet received."
       ]
     }
   ];
@@ -333,7 +358,11 @@
           "</div>"
         );
       }).join("");
-      scoreBody = '<div class="bands">' + bandRows + "</div>";
+      var recommendationText = d.recommendations ? d.recommendations[domain.bandIndex] : null;
+      var recommendation = recommendationText
+        ? '<div class="recommendation"><div class="recommendation-label">Recommended practice</div><div class="recommendation-text">' + escapeHtml(recommendationText) + "</div></div>"
+        : "";
+      scoreBody = '<div class="bands">' + bandRows + "</div>" + recommendation;
     } else {
       scoreBody = '<div class="score-hint">' + domain.answeredCount + " of 7 answered — complete all seven to see your score.</div>";
     }

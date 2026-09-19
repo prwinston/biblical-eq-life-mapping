@@ -254,6 +254,29 @@ button, input { font-family: inherit; }
 .band-text { font-size: 13px; color: var(--ink-faint); line-height: 1.5; }
 .band-row.active .band-text { color: var(--ink); }
 
+.recommendation {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 16px;
+  margin-top: 4px;
+  border-top: 1px solid var(--border-hair);
+}
+.recommendation-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+  font-weight: 600;
+}
+.recommendation-text {
+  font-family: 'Lora', Georgia, serif;
+  font-style: italic;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--ink);
+}
+
 /* Synthesis */
 .synthesis { display: flex; flex-direction: column; gap: 24px; padding-top: 16px; border-top: 1px solid var(--border-hair); }
 .synthesis-head { display: flex; flex-direction: column; gap: 6px; text-align: center; }
