@@ -38,6 +38,10 @@
         "Start with the most basic mirror work: for one week, name one emotion by its precise word at the end of each day — not “fine” or “stressed,” but the specific feeling underneath it. Ask one trusted person how a recent decision of yours looked from where they stood, and simply listen.",
         "Build a fixed rhythm around the reflection you already do naturally — a two-minute check-in at the same time each day turns occasional insight into a habit. Ask for feedback on the specific blind spot you suspect is there, not just general feedback.",
         "Your mirror work is a resource, not only a discipline — use it to help someone else see themselves more clearly. Keep actively soliciting feedback so strength doesn’t quietly harden into blind confidence."
+      ],
+      reflection: [
+        "The last time someone gave me feedback that genuinely surprised me was: ___. What it revealed was:",
+        "The feeling I most struggle to name accurately in the moment (rather than in hindsight) is:"
       ]
     },
     {
@@ -64,6 +68,10 @@
         "Pick the one situation where regulation fails most often, and install a single circuit-breaker for it: a fixed pause — counting to ten, leaving the room, one breath of prayer — before you respond, in that exact situation, this week.",
         "You can regulate in most situations; find the specific pressure point where it still breaks down, and build one deliberate strategy for that pressure point alone, rather than a general resolution to ‘stay calmer.’",
         "The furnace has done real formation work in you — the next step is naming it out loud to someone walking through their own furnace right now, so your regulation becomes their evidence that it’s possible."
+      ],
+      reflection: [
+        "The situation in which my self-regulation most consistently fails is: ___. What it costs the people around me is:",
+        "The furnace I am currently in (injustice / limitation / repetition / role) is: ___. What I suspect it is forming in me is:"
       ]
     },
     {
@@ -90,6 +98,10 @@
         "Sit, like Nehemiah, with the specific ruin you keep managing rather than mourning. Give it ten unhurried minutes this week — no fixing, just naming what’s actually broken — before asking what rebuilding would require of you.",
         "Name the one recognition or outcome your drive still quietly depends on, and do the next right thing in that area once without telling anyone — a small test of whether the burden, not the applause, is what’s sourcing you.",
         "Burden-based drive is rare and depletable — protect it deliberately. Build in a rhythm of rest before the ruins wear you down; the risk at this level isn’t losing the calling, it’s losing yourself inside it."
+      ],
+      reflection: [
+        "The current source of my drive is (excitement / obligation / burden — circle one). The evidence that tells me this is:",
+        "The broken thing I cannot look away from — whether or not I feel equipped for it — is:"
       ]
     },
     {
@@ -116,6 +128,10 @@
         "Before any new crossing, address the depletion itself: block one hour this week with no caregiving demands on it at all, and treat it as the precondition for empathy, not a reward for having enough left over.",
         "Identify the one relationship currently receiving the least genuine crossing from you, and make one specific, scheduled move toward it this week — a call, a visit, a real question — rather than waiting to feel more resourced first.",
         "Your capacity to cross is strong; the ongoing work is tending the source it draws from. Build one recurring practice — solitude, worship, supervision, a friendship that pours into you — that isn’t itself another act of caregiving."
+      ],
+      reflection: [
+        "My honest rating for my current capacity to genuinely enter another person’s world is: ___ / 10. The relationship that has received the least genuine crossing from me recently is:",
+        "The person I find hardest to cross toward right now is: ___. What stops me is (fear / depletion / assumption / distance):"
       ]
     },
     {
@@ -142,6 +158,10 @@
         "Notice where your influence still runs on position or competence rather than character, and pick one low-stakes relationship this week to lead purely through the quality of your presence — no title, no expertise, just attention.",
         "You have a door in your hands — name the specific access or opportunity only you can currently offer someone, and open it for them deliberately this week, rather than waiting for the ideal moment.",
         "The door is open for others consistently — the growth edge now is the hardest conversation you’ve been avoiding: the correction or honest word someone needs from you and hasn’t yet received."
+      ],
+      reflection: [
+        "The door currently in my hands — the specific access or opportunity I have that others around me do not — is:",
+        "The person I most need to have a courageous, honest, and relational conversation with (a correction, a development conversation, a needed truth) is: ___. What has stopped me is:"
       ]
     }
   ];
@@ -156,7 +176,7 @@
     door: '<svg width="26" height="26" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h13v24H9z"></path><circle cx="19" cy="16" r="1.2" fill="currentColor" stroke="none"></circle></svg>'
   };
 
-  var state = { answers: {}, name: "", date: "" };
+  var state = { answers: {}, name: "", date: "", reflections: {} };
 
   // ---------- persistence ----------
 
@@ -169,6 +189,7 @@
           state.answers = parsed.answers || {};
           state.name = parsed.name || "";
           state.date = parsed.date || "";
+          state.reflections = parsed.reflections || {};
         }
       }
     } catch (e) {
@@ -244,9 +265,15 @@
     saveState();
   }
 
+  function setReflection(num, value) {
+    state.reflections[num] = value;
+    saveState();
+    /* No re-render here: re-rendering would rebuild the textarea and drop focus/caret mid-typing. */
+  }
+
   function resetAll() {
     if (!window.confirm("Clear all your answers? This cannot be undone.")) return;
-    state = { answers: {}, name: "", date: "" };
+    state = { answers: {}, name: "", date: "", reflections: {} };
     saveState();
     render();
   }
@@ -254,6 +281,7 @@
   window.setAnswer = setAnswer;
   window.setName = setName;
   window.setDate = setDate;
+  window.setReflection = setReflection;
   window.resetAll = resetAll;
 
   // ---------- PDF export ----------
@@ -378,6 +406,19 @@
       if (domain.complete && d.recommendations) {
         paragraph(d.recommendations[domain.bandIndex], "times", "italic", 11, INK, 15);
       }
+
+      var reflectionNote = (state.reflections[d.num] || "").trim();
+      if (reflectionNote) {
+        y += 6;
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(9);
+        doc.setTextColor(LABEL[0], LABEL[1], LABEL[2]);
+        ensureSpace(13);
+        doc.text("MY REFLECTION", margin, y);
+        y += 14;
+        paragraph(reflectionNote, "helvetica", "normal", 10.5, INK_SOFT, 15);
+      }
+
       y += 12;
     });
 
@@ -520,6 +561,20 @@
       scoreBody = '<div class="score-hint">' + domain.answeredCount + " of 7 answered — complete all seven to see your score.</div>";
     }
 
+    var reflectionCard = "";
+    if (d.reflection && d.reflection.length) {
+      var prompts = d.reflection.map(function (p, i) {
+        return '<div class="reflect-prompt">' + (i + 1) + ".&nbsp; " + escapeHtml(p) + "</div>";
+      }).join("");
+      var reflectionValue = state.reflections[d.num] || "";
+      reflectionCard =
+        '<div class="card reflection-card">' +
+        '<div class="reflection-label">Reflection prompts</div>' +
+        '<div class="reflect-prompts">' + prompts + "</div>" +
+        '<textarea class="reflect-area" placeholder="Write space (2–3 sentences)…" aria-label="Reflection notes for ' + escapeAttr(d.subtitle) + '" oninput="setReflection(' + d.num + ", this.value)\">" + escapeHtml(reflectionValue) + "</textarea>" +
+        "</div>";
+    }
+
     return (
       '<div class="domain">' +
       '<div class="domain-head">' +
@@ -536,6 +591,7 @@
       '<div class="score-value-row"><span class="score-value">' + domain.scoreLabel + '</span><span class="score-max">/ 5.0</span></div></div>' +
       scoreBody +
       "</div>" +
+      reflectionCard +
       "</div>"
     );
   }
@@ -559,7 +615,7 @@
 
     var downloadHint = totalAnswered > 0
       ? (allComplete
-          ? "Saves your scores, status and recommended practice for each domain as a PDF."
+          ? "Saves your scores, status, recommended practice and any reflection notes for each domain as a PDF."
           : "You can download a summary any time — it will note which domains are still in progress.")
       : "Answer at least one domain to enable the download.";
 

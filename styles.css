@@ -262,6 +262,33 @@ button, input { font-family: inherit; }
   color: var(--ink);
 }
 
+/* Reflection prompts */
+.reflection-card { display: flex; flex-direction: column; gap: 16px; }
+.reflection-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--label);
+}
+.reflect-prompts { display: flex; flex-direction: column; gap: 12px; }
+.reflect-prompt { font-size: 14px; line-height: 1.6; color: var(--ink); }
+.reflect-area {
+  width: 100%;
+  min-height: 96px;
+  resize: vertical;
+  border: 1px solid rgba(43, 36, 32, 0.2);
+  border-radius: 4px;
+  padding: 12px;
+  font-family: 'Source Sans 3', system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ink);
+  background: var(--paper);
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+.reflect-area:focus { border-color: var(--accent); outline: none; }
+
 /* Synthesis */
 .synthesis { display: flex; flex-direction: column; gap: 24px; padding-top: 16px; border-top: 1px solid var(--border-hair); }
 .synthesis-head { display: flex; flex-direction: column; gap: 6px; text-align: center; }

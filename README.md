@@ -12,13 +12,18 @@ Winston H.K. Chew.
 
 A plain, static website — `index.html`, `styles.css`, `script.js`. No build
 step, no framework, no backend, no database, no tracking. All the scoring
-logic runs in the visitor's browser, and their in-progress answers are saved
-to their own browser's `localStorage` so a refresh doesn't lose their place.
-Nothing is ever sent to a server.
+logic runs in the visitor's browser, and their in-progress answers —
+ratings and written reflection notes alike — are saved to their own
+browser's `localStorage` so a refresh doesn't lose their place. Nothing is
+ever sent to a server.
+
+Each domain ends with its two Reflection Prompts and a free-text write
+space; those notes are optional, saved locally like everything else, and
+included in the PDF when written.
 
 A "Download results (PDF)" button under the synthesis map lets a visitor
-save a one-page results summary — their name/date/context (if entered),
-each domain's score, status and matched recommendation, and the full
+save a results summary — their name/date (if entered), each domain's score,
+status, matched recommendation and any reflection notes, and the full
 synthesis map — generated entirely in their browser via
 [jsPDF](https://github.com/parallax/jsPDF), vendored locally in
 `vendor/jspdf.umd.min.js` (MIT-licensed; see `vendor/jspdf-LICENSE.txt`) so
